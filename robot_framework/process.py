@@ -1,8 +1,8 @@
 """This module contains the main process of the robot."""
 import json
-from msb_rpa.generelt import sql_insert_result
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-from robot_framework import config
+from robot_framework.Processer.add_testfiles import add_testfiles
+from robot_framework.Processer.make_folderpath import make_folderpath
 
 
 def process(orchestrator_connection: OrchestratorConnection, queue_element) -> None:
@@ -16,14 +16,6 @@ def process(orchestrator_connection: OrchestratorConnection, queue_element) -> N
     else:
         queue_dict = ''
     # Hent RPA_ID og ExecutionID fra køelementet
-    rpa_id = str(queue_element.reference)
-    executionid = str(queue_element.id)
-    sql_connection = orchestrator_connection.get_credential("sql_connection_string").password
 
-    # Send start til Result tabellen
-    sql_insert_result(rpa_id, executionid, '1', "{}", sql_connection, config.RESULT_TABLE)
-
-    # ##INDSÆT DIN PROCES HER###
-
-    # Send slut til Result tabellen
-    sql_insert_result(rpa_id, executionid, "2", "{}", sql_connection, config.RESULT_TABLE)
+    folderpath = make_folderpath(queue_dict["serial"], queue_dict["cpr"])
+    add_testfiles(folderpath)

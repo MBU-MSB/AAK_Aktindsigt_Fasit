@@ -2,6 +2,7 @@
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from msb_rpa.generelt import use_retry_logic
 from msb_rpa.logins import fasit_login
+from msb_rpa.web import close_website_panes
 
 
 def reset(orchestrator_connection: OrchestratorConnection) -> None:
@@ -14,12 +15,14 @@ def reset(orchestrator_connection: OrchestratorConnection) -> None:
 def kill_all(orchestrator_connection: OrchestratorConnection) -> None:
     """Forcefully close all applications used by the robot."""
     orchestrator_connection.log_trace("Killing all applications.")
+    close_website_panes()
     orchestrator_connection.log_trace("Killed all applications succesfully")
 
 
 def open_all(orchestrator_connection: OrchestratorConnection) -> None:
     """Open all programs used by the robot."""
     orchestrator_connection.log_trace("Opening all applications.")
-    # gemt_credential = orchestrator_connection.get_credential("000_Eksempel_Opus")
-    # opus_login(username=gemt_credential.username,password=gemt_credential.password)
+    gemt_credential = orchestrator_connection.get_credential("021_Fleksjob_Sagshåndtering_Fasit")
+    bearer_token = use_retry_logic(fasit_login, username=gemt_credential.username, password=gemt_credential.password, drivertype='chrome_wire')
     orchestrator_connection.log_trace("Opened application succesfully")
+    return bearer_token

@@ -2,8 +2,6 @@
 import json
 from msb_rpa.generelt import sql_insert_result
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-from robot_framework.Processer.make_folderpath import make_folderpath
-from robot_framework.Processer.add_testfiles import add_testfiles
 from robot_framework import config
 
 

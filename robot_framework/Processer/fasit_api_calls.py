@@ -84,7 +84,7 @@ def get_attached_file(citizenid: str, attachmentid: str, bearer_token: str):
     headers = {
     'accept': 'application/octet-stream',
     'accept-language': 'da-DK,da;q=0.9,en-US;q=0.8,en;q=0.7',
-    'authorization': bearer_token,
+    'authorization': f'Bearer {bearer_token}',
     'content-type': 'application/json',
     'origin': 'https://aarhus.schultzfasit.dk',
     'priority': 'u=1, i',
@@ -101,4 +101,8 @@ def get_attached_file(citizenid: str, attachmentid: str, bearer_token: str):
 
     response = requests.request("POST", url, headers=headers, data=payload, timeout= 30)
 
-    print(response.text)
+    # Save the PDF file
+    with open('downloaded_file.pdf', 'wb') as f:
+        f.write(response.content)
+
+    print("File downloaded successfully as 'downloaded_file.pdf'.")

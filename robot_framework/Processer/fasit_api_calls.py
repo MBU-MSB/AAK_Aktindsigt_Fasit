@@ -1,5 +1,6 @@
 """API kald til Fasit"""
 import json
+import os
 from datetime import datetime
 import requests
 
@@ -62,24 +63,26 @@ def get_journalnotes_for_citizenid(citizenid: str, bearer_token: str, start_date
     ]
 
     # Extract attachment IDs from filtered journal notes
-    attachment_ids = [
-        attachment['id']
+    attachments = [
+        attachment
         for note in filtered_journal_notes
         for attachment in note.get('attachments', [])
     ]
 
-    print("Attachment IDs:", attachment_ids)
+    print("Attachment IDs:", attachments)
+    for attachment in attachments:
+        print(attachment['mimeType'])
 
-    return attachment_ids
+    return attachments
 
 
-def get_attached_file(citizenid: str, attachmentid: str, bearer_token: str):
+def get_attached_file(queue_dict: dict, attachment: dict, bearer_token: str):
     """Download attachment"""
     url = "https://jobcenter-bff.schultzfasit.dk/api/citizen/journal/queries/downloadjournalnoteattachment"
 
     payload = json.dumps({
-    "attachmentId": attachmentid,
-    "citizenId": citizenid
+    "attachmentId": attachment["id"],
+    "citizenId": queue_dict['Citizenid']
     })
     headers = {
     'accept': 'application/octet-stream',
@@ -101,8 +104,15 @@ def get_attached_file(citizenid: str, attachmentid: str, bearer_token: str):
 
     response = requests.request("POST", url, headers=headers, data=payload, timeout= 30)
 
-    # Save the PDF file
-    with open('downloaded_file.pdf', 'wb') as f:
-        f.write(response.content)
+    # Define the directory path
+    directory_path = rf"\\srvsql46\INDBAKKE\AAK_Aktindsigt\{queue_dict['Serial']}_{queue_dict['CPR']}\Fasit"
 
-    print("File downloaded successfully as 'downloaded_file.pdf'.")
+    # Create the directory if it does not exist
+    os.makedirs(directory_path, exist_ok=True)
+
+    # Save the file content to a local file
+    file_save_path = os.path.join(directory_path, attachment['fileName'])
+    with open(file_save_path, 'wb') as file:
+        file.write(response.content)
+
+    print(f"File downloaded successfully as '{attachment['fileName']}'.")

@@ -15,8 +15,10 @@ orchestrator_connection = OrchestratorConnection(process_name="000_00_Eksempel",
 gemt_credential = orchestrator_connection.get_credential("021_Fleksjob_Sagshåndtering_Fasit")
 bearer_token = use_retry_logic(fasit_login, username=gemt_credential.username, password=gemt_credential.password, drivertype='chrome_wire')
 
-attachment_ids = get_journalnotes_for_citizenid('6791B45D-EA2D-E611-80F6-00155D177806', bearer_token, '2015-01-01', '2024-01-01')
-for attachment_id in attachment_ids:
-    get_attached_file('6791B45D-EA2D-E611-80F6-00155D177806', attachment_id, bearer_token)
+test_dict = {"CPR":"0209862158","Citizenid":"6AEA3742-D12D-E611-80F6-00155D177806","Startdato":"2015-01-01","Slutdato":"2025-06-01","Serial":"10"}
+
+attachments = get_journalnotes_for_citizenid(test_dict["Citizenid"], bearer_token, test_dict["Startdato"], test_dict["Slutdato"])
+for attachment in attachments:
+    get_attached_file(test_dict, attachment, bearer_token)
 
 print("Stop her")
